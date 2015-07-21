@@ -42,4 +42,23 @@ public class spider {
         }while(this.pagesVisited.size() < PAGE_LIMIT && !this.pagesToVisit.isEmpty());
         
     }
+    
+    //overloaded function for searching pages with credentials
+    public void search(String url, String credentials){
+        do{
+            spiderUtility spideyKit = new spiderUtility();
+            String CurrentUrl;
+            if(this.pagesToVisit.isEmpty()){
+                CurrentUrl = url;
+                this.pagesVisited.add(CurrentUrl);
+            }else{
+                CurrentUrl = nextUrl();
+            }
+            spideyKit.crawl(CurrentUrl, credentials);
+            this.pagesToVisit.addAll(spideyKit.getLinks());
+            System.out.println("Visited page : "+CurrentUrl);
+        }while(this.pagesVisited.size() < PAGE_LIMIT && !this.pagesToVisit.isEmpty());
+        
+    }
+
 }

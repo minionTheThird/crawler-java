@@ -35,6 +35,22 @@ public class spiderUtility {
         }
     }
     
+  //overloaded function with credential logging 
+    public void crawl(String url, String credentials){
+        try{
+            Connection conn = Jsoup.connect(url).header("Authorization", "Basic "+credentials).userAgent(USER_AGENT);
+            this.htmlPage = conn.get();
+            
+            Elements pageLinks = this.htmlPage.select("a[href]");
+            for (Element e : pageLinks) {
+               this.urls.add(e.absUrl("href")); 
+            }
+        }catch(IOException e){
+            System.out.println("Error while crawling");
+            e.printStackTrace();
+        }
+    }
+    
     public List<String> getLinks(){
         return this.urls;
     }
