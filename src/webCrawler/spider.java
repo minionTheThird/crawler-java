@@ -1,23 +1,31 @@
 package webCrawler;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class spider {
     
-    public spider() {
-        this.PAGE_LIMIT = 10;
-        this.pagesToVisit = new LinkedList<>();
-        this.pagesVisited = new HashSet<>();
-    }
-    
-    int PAGE_LIMIT;
+    private static final int PAGE_LIMIT = 100;
     private Set<String> pagesVisited;
     private List<String> pagesToVisit;
+    private Map<String, List<String>> searchResult;
+
+    public Map<String, List<String>> getSearchResult() {
+        return this.searchResult;
+    }
+
+    public spider() {
+        this.pagesToVisit = new LinkedList<>();
+        this.pagesVisited = new HashSet<>();
+        this.searchResult = new HashMap<>();
+    }
     
-    String nextUrl(){
+    private String nextUrl(){
         String nextURL;
         do{
             nextURL = pagesToVisit.remove(0);
@@ -27,24 +35,11 @@ public class spider {
     }
     
     public void search(String url){
-        do{
-            spiderUtility spideyKit = new spiderUtility();
-            String CurrentUrl;
-            if(this.pagesToVisit.isEmpty()){
-                CurrentUrl = url;
-                this.pagesVisited.add(CurrentUrl);
-            }else{
-                CurrentUrl = nextUrl();
-            }
-            spideyKit.crawl(CurrentUrl);
-            this.pagesToVisit.addAll(spideyKit.getLinks());
-            System.out.println("Visited page : "+CurrentUrl);
-        }while(this.pagesVisited.size() < PAGE_LIMIT && !this.pagesToVisit.isEmpty());
-        
+        search(url,"");
     }
     
-    //overloaded function for searching pages with credentials
-    public void search(String url, String credentials){
+    public void search(String url, String credentials, String... type){
+        Set<String> fileTypes = new HashSet<>(Arrays.asList(type));
         do{
             spiderUtility spideyKit = new spiderUtility();
             String CurrentUrl;
@@ -54,9 +49,9 @@ public class spider {
             }else{
                 CurrentUrl = nextUrl();
             }
-            spideyKit.crawl(CurrentUrl, credentials);
+            spideyKit.crawl(CurrentUrl, credentials, fileTypes);
             this.pagesToVisit.addAll(spideyKit.getLinks());
-            System.out.println("Visited page : "+CurrentUrl);
+            spideyKit.getFiles().forEach((k,v) -> searchResult.merge(k, v, (v1,v2) -> {v1.addAll(v2); return v1;}));
         }while(this.pagesVisited.size() < PAGE_LIMIT && !this.pagesToVisit.isEmpty());
         
     }
