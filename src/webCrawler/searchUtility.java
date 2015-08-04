@@ -14,14 +14,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class spiderUtility {
+public class searchUtility {
     
     private List<String> urls;
     private Map<String, List<String>> files;
     private Document htmlPage;
-    private static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
+    static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
     
-    public spiderUtility() {
+    public searchUtility() {
         this.urls = new LinkedList<>();
         this.files = new HashMap<>();
     }
@@ -36,25 +36,20 @@ public class spiderUtility {
     
     public void crawl(String url, String credentials, Set<String> type){
         try{
-            Connection conn = Jsoup.connect(url).header("Authorization", "Basic "+credentials).userAgent(USER_AGENT);
-            this.htmlPage = conn.get();
-            
+            Connection conn = Jsoup.connect(url).header("Authorization", "Basic " + credentials).userAgent(USER_AGENT);
+            this.htmlPage = conn.ignoreContentType(true).get();
             Elements pageLinks = this.htmlPage.select("a[href]");
             for (Element e : pageLinks) {
-                String fileType = e.absUrl("href")
-                                    .trim()
-                                    .substring(e.absUrl("href").lastIndexOf('.') + 1)
-                                    .toLowerCase();
-                if (type.contains(fileType)){
-                    if(files.containsKey(fileType)){
+                String fileType = e.absUrl("href").trim()
+                        .substring(e.absUrl("href").lastIndexOf('.') + 1)
+                        .toLowerCase();
+                if (type.contains(fileType)) {
+                    if (files.containsKey(fileType))
                         files.get(fileType).add(e.absUrl("href"));
-                    }
-                    else files.put(fileType, new LinkedList<String>(){{
-                      add(e.absUrl("href"));  
-                    }});
-                }
-                else
-                    this.urls.add(e.absUrl("href")); 
+                    else
+                        files.put(fileType, new LinkedList<String>() {{ add(e.absUrl("href")); }});
+                } else
+                    this.urls.add(e.absUrl("href"));
             }
         }catch(IOException e){
             System.out.println("Error while crawling");

@@ -1,5 +1,13 @@
 package webCrawler;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,7 +49,7 @@ public class spider {
     public void search(String url, String credentials, String... type){
         Set<String> fileTypes = new HashSet<>(Arrays.asList(type));
         do{
-            spiderUtility spideyKit = new spiderUtility();
+            searchUtility spideyKit = new searchUtility();
             String CurrentUrl;
             if(this.pagesToVisit.isEmpty()){
                 CurrentUrl = url;
@@ -55,5 +63,13 @@ public class spider {
         }while(this.pagesVisited.size() < PAGE_LIMIT && !this.pagesToVisit.isEmpty());
         
     }
+    
+    public void downloadFiles(String directory){
+        downloadFiles(directory,"");
+    }
 
+    public void downloadFiles(String directory, String credentials) {
+        downloadUtility downloadManager = new downloadUtility();
+        this.searchResult.forEach((k,v) -> v.forEach(s -> downloadManager.download(s, directory, credentials)));
+    }
 }
