@@ -14,18 +14,25 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/**
+ * Utility class for providing search functionality.
+ * Creates connection and fetches content on page and gets search result
+ */
 public class searchUtility {
     
+    /**
+     * USER_AGENT : To mimic a browser request so that server doesnot identify it as robot. 
+     */
+    static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
     private List<String> urls;
     private Map<String, List<String>> files;
     private Document htmlPage;
-    static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
     
     public searchUtility() {
         this.urls = new LinkedList<>();
         this.files = new HashMap<>();
     }
-    
+
     public void crawl(String url){
         crawl(url,""); 
     }
@@ -34,6 +41,12 @@ public class searchUtility {
         crawl(url,credentials, new HashSet<String>() ); 
     }
     
+    /**
+     * For given URL, creates connection, fetches content and search for provided file types
+     * @param url           : URL to be searched
+     * @param credentials   : base64 encoded login credentails (username : password)
+     * @param type          : file types to be searched
+     */
     public void crawl(String url, String credentials, Set<String> type){
         try{
             Connection conn = Jsoup.connect(url).header("Authorization", "Basic " + credentials).userAgent(USER_AGENT);
@@ -57,10 +70,16 @@ public class searchUtility {
         }
     }
     
+    /**
+     * @return : all the links found on the page 
+     */
     public List<String> getLinks(){
         return this.urls;
     }
     
+    /**
+     * @return : all the files found on the page
+     */
     public Map<String, List<String>> getFiles(){
         return this.files;
     }
